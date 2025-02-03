@@ -261,7 +261,7 @@ function installQuestions() {
 	fi
 	if eval "$PING6"; then
 		echo "Your host appears to have IPv6 connectivity."
-		SUGGESTION="y"
+		SUGGESTION="n" #id if supports type y
 	else
 		echo "Your host does not appear to have IPv6 connectivity."
 		SUGGESTION="n"
@@ -901,7 +901,7 @@ tls-cipher $CC_CIPHER
 client-config-dir /etc/openvpn/ccd
 status /var/log/openvpn/status.log
 verb 3
-scramble xormask rforu'ZY||z@U%zDvt;)N5>fy3AURVvL" >>/etc/openvpn/server.conf
+scramble xormask W7%$ds*&" >>/etc/openvpn/server.conf
 
 	# Create client-config-dir dir
 	mkdir -p /etc/openvpn/ccd
@@ -1019,85 +1019,6 @@ WantedBy=multi-user.target" >/etc/systemd/system/iptables-openvpn.service
 	systemctl enable iptables-openvpn
 	systemctl start iptables-openvpn
 
-touch /root/traffic_sum.sh
-touch /var/log/openvpn/traffic_update.log
-chmod 666 /var/log/openvpn/traffic_update.log
-
-echo "#!/bin/bash
-
-# Путь к файлу OpenVPN
-STATUS_LOG="/var/log/openvpn/status.log"
-# Папка для сохранения суммарного трафика
-TRAFFIC_DIR="/var/log/openvpn/traffic"
-
-# Проверяем существование лог-файла OpenVPN
-if [ ! -f "$STATUS_LOG" ]; then
-    echo "Файл $STATUS_LOG не найден. Проверьте путь и права доступа."
-    exit 1
-fi
-
-# Создаём директорию для хранения суммарного трафика, если она отсутствует
-if [ ! -d "$TRAFFIC_DIR" ]; then
-    mkdir -p "$TRAFFIC_DIR"
-    chmod 750 "$TRAFFIC_DIR"
-fi
-
-# Читаем пользователей и их текущий трафик
-tail -n +4 "$STATUS_LOG" | head -n -1 | grep -E "^[^,]+,[^,]+,[0-9]+,[0-9]+," | while IFS=, read -r common_name real_address bytes_received bytes_sent connected_since; do
-    # Файл для хранения трафика конкретного пользователя
-    USER_FILE="$TRAFFIC_DIR/$common_name.traffic"
-
-    # Если файл пользователя существует, считываем предыдущие значения
-    if [ -f "$USER_FILE" ]; then
-        read -r prev_received prev_sent prev_total_received prev_total_sent < "$USER_FILE"
-    else
-        # Если файл не существует, начинаем с нуля
-        prev_received=0
-        prev_sent=0
-        prev_total_received=0
-        prev_total_sent=0
-    fi
-
-    # Рассчитываем изменения (дельту) трафика
-    delta_received=$((bytes_received - prev_received))
-    delta_sent=$((bytes_sent - prev_sent))
-
-    # Если дельта отрицательная, это может быть из-за перезапуска OpenVPN или сброса логов
-    if (( delta_received < 0 )); then
-        delta_received=$bytes_received
-    fi
-    if (( delta_sent < 0 )); then
-        delta_sent=$bytes_sent
-    fi
-
-    # Суммируем дельту с общим трафиком
-    total_received=$((prev_total_received + delta_received))
-    total_sent=$((prev_total_sent + delta_sent))
-
-    # Сохраняем новые значения в файл
-    echo "$bytes_received $bytes_sent $total_received $total_sent" > "$USER_FILE"
-
-    # Конвертируем в мегабайты для вывода
-    received_mb=$(echo "$total_received / 1024 / 1024" | bc -l)
-    sent_mb=$(echo "$total_sent / 1024 / 1024" | bc -l)
-
-    # Выводим информацию о пользователе
-    printf "Пользователь: %-16s Получено: %-10.2f MB Отправлено: %-10.2f MB\n" "$common_name" "$received_mb" "$sent_mb"
-done" > /root/traffic_sum.sh
-
-echo "copy paste to crontab -e : */20 * * * * /root/traffic_sum.sh >> /var/log/openvpn/traffic_update.log 2>&1 "
-crontab -e
-
-sudo nano /root/traffic_sum.sh
-chmod +x /root/traffic_sum.sh
-
-echo "downloading pi-hole"
-git clone --depth 1 https://github.com/pi-hole/pi-hole.git Pi-hole
-cd "Pi-hole/automated install/"
-sudo bash basic-install.sh
-echo "check if PIHOLE_INTERFACE=tun0"
-sudo nano /etc/pihole/setupVars.conf
-
 	# If the server is behind a NAT, use the correct IP address for the clients to connect to
 	if [[ $ENDPOINT != "" ]]; then
 		IP=$ENDPOINT
@@ -1128,7 +1049,7 @@ tls-cipher $CC_CIPHER
 ignore-unknown-option block-outside-dns
 setenv opt block-outside-dns # Prevent Windows 10 DNS leak
 verb 3
-scramble xormask rforu'ZY||z@U%zDvt;)N5>fy3AURVvL" >>/etc/openvpn/client-template.txt
+scramble xormask W7%$ds*&" >>/etc/openvpn/client-template.txt
 
 	if [[ $COMPRESSION_ENABLED == "y" ]]; then
 		echo "compress $COMPRESSION_ALG" >>/etc/openvpn/client-template.txt
@@ -1499,6 +1420,90 @@ function removeOpenVPN() {
 	fi
 }
 
+function setupPiHole() {
+echo "sudo nano /etc/pihole/setupVars.conf
+РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ СЃС‚СЂРѕРєР° PIHOLE_INTERFACE=tun0 РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚"
+git clone --depth 1 https://github.com/pi-hole/pi-hole.git Pi-hole
+cd "Pi-hole/automated install/"
+sudo bash basic-install.sh
+echo "sudo nano /etc/pihole/setupVars.conf
+РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ СЃС‚СЂРѕРєР° PIHOLE_INTERFACE=tun0 РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚"
+sudo systemctl restart openvpn@server
+sudo systemctl restart pihole-FTL
+}
+
+function setupTrafficCounter() {
+touch /root/traffic_sum.sh
+touch /var/log/openvpn/status.log
+chmod +x /root/traffic_sum.sh
+
+touch /var/log/openvpn/traffic_update.log
+chmod 666 /var/log/openvpn/traffic_update.log
+
+echo "#!/bin/bash
+# РџСѓС‚СЊ Рє С„Р°Р№Р»Сѓ OpenVPN
+STATUS_LOG="/var/log/openvpn/status.log"
+# РџР°РїРєР° РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ СЃСѓРјРјР°СЂРЅРѕРіРѕ С‚СЂР°С„РёРєР°
+TRAFFIC_DIR="/var/log/openvpn/traffic"
+
+# РџСЂРѕРІРµСЂСЏРµРј СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ Р»РѕРі-С„Р°Р№Р»Р° OpenVPN
+if [ ! -f "$STATUS_LOG" ]; then
+    echo "Р¤Р°Р№Р» $STATUS_LOG РЅРµ РЅР°Р№РґРµРЅ. РџСЂРѕРІРµСЂСЊС‚Рµ РїСѓС‚СЊ Рё РїСЂР°РІР° РґРѕСЃС‚СѓРїР°."
+    exit 1
+fi
+
+# РЎРѕР·РґР°С‘Рј РґРёСЂРµРєС‚РѕСЂРёСЋ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃСѓРјРјР°СЂРЅРѕРіРѕ С‚СЂР°С„РёРєР°, РµСЃР»Рё РѕРЅР° РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
+if [ ! -d "$TRAFFIC_DIR" ]; then
+    mkdir -p "$TRAFFIC_DIR"
+    chmod 750 "$TRAFFIC_DIR"
+fi
+
+# Р§РёС‚Р°РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ Рё РёС… С‚РµРєСѓС‰РёР№ С‚СЂР°С„РёРє
+tail -n +4 "$STATUS_LOG" | head -n -1 | grep -E "^[^,]+,[^,]+,[0-9]+,[0-9]+," | while IFS=, read -r common_name real_address bytes_received bytes_sent connected_since; do
+    # Р¤Р°Р№Р» РґР»СЏ С…СЂР°РЅРµРЅРёСЏ С‚СЂР°С„РёРєР° РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+    USER_FILE="$TRAFFIC_DIR/$common_name.traffic"
+
+    # Р•СЃР»Рё С„Р°Р№Р» РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ СЃСѓС‰РµСЃС‚РІСѓРµС‚, СЃС‡РёС‚С‹РІР°РµРј РїСЂРµРґС‹РґСѓС‰РёРµ Р·РЅР°С‡РµРЅРёСЏ
+    if [ -f "$USER_FILE" ]; then
+        read -r prev_received prev_sent prev_total_received prev_total_sent < "$USER_FILE"
+    else
+        # Р•СЃР»Рё С„Р°Р№Р» РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РЅР°С‡РёРЅР°РµРј СЃ РЅСѓР»СЏ
+        prev_received=0
+        prev_sent=0
+        prev_total_received=0
+        prev_total_sent=0
+    fi
+
+    # Р Р°СЃСЃС‡РёС‚С‹РІР°РµРј РёР·РјРµРЅРµРЅРёСЏ (РґРµР»СЊС‚Сѓ) С‚СЂР°С„РёРєР°
+    delta_received=$((bytes_received - prev_received))
+    delta_sent=$((bytes_sent - prev_sent))
+
+    # Р•СЃР»Рё РґРµР»СЊС‚Р° РѕС‚СЂРёС†Р°С‚РµР»СЊРЅР°СЏ, СЌС‚Рѕ РјРѕР¶РµС‚ Р±С‹С‚СЊ РёР·-Р·Р° РїРµСЂРµР·Р°РїСѓСЃРєР° OpenVPN РёР»Рё СЃР±СЂРѕСЃР° Р»РѕРіРѕРІ
+    if (( delta_received < 0 )); then
+        delta_received=$bytes_received
+    fi
+    if (( delta_sent < 0 )); then
+        delta_sent=$bytes_sent
+    fi
+
+    # РЎСѓРјРјРёСЂСѓРµРј РґРµР»СЊС‚Сѓ СЃ РѕР±С‰РёРј С‚СЂР°С„РёРєРѕРј
+    total_received=$((prev_total_received + delta_received))
+    total_sent=$((prev_total_sent + delta_sent))
+
+    # РЎРѕС…СЂР°РЅСЏРµРј РЅРѕРІС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РІ С„Р°Р№Р»
+    echo "$bytes_received $bytes_sent $total_received $total_sent" > "$USER_FILE"
+
+    # РљРѕРЅРІРµСЂС‚РёСЂСѓРµРј РІ РјРµРіР°Р±Р°Р№С‚С‹ РґР»СЏ РІС‹РІРѕРґР°
+    received_mb=$(echo "$total_received / 1024 / 1024" | bc -l)
+    sent_mb=$(echo "$total_sent / 1024 / 1024" | bc -l)
+
+    # Р’С‹РІРѕРґРёРј РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РїРѕР»СЊР·РѕРІР°С‚РµР»Рµ
+    printf "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ: %-16s РџРѕР»СѓС‡РµРЅРѕ: %-10.2f MB РћС‚РїСЂР°РІР»РµРЅРѕ: %-10.2f MB\n" "$common_name" "$received_mb" "$sent_mb"
+done" > /root/traffic_sum.sh
+echo "paste this: */20 * * * * /root/traffic_sum.sh >> /var/log/openvpn/traffic_update.log 2>&1"
+crontab -e
+}
+
 function manageMenu() {
 	echo "Welcome to OpenVPN-install!"
 	echo "The git repository is available at: https://github.com/angristan/openvpn-install"
@@ -1510,9 +1515,11 @@ function manageMenu() {
  	echo "   2) Add multiple new users"
 	echo "   3) Revoke existing user"
 	echo "   4) Remove OpenVPN"
-	echo "   5) Exit"
-	until [[ $MENU_OPTION =~ ^[1-5]$ ]]; do
-		read -rp "Select an option [1-4]: " MENU_OPTION
+	echo "   5) Remove OpenVPN"
+	echo "   6) Remove OpenVPN"
+	echo "   7) Exit"
+	until [[ $MENU_OPTION =~ ^[1-7]$ ]]; do
+		read -rp "Select an option [1-7]: " MENU_OPTION
 	done
 
 	case $MENU_OPTION in
@@ -1529,6 +1536,12 @@ function manageMenu() {
 		removeOpenVPN
 		;;
 	5)
+	    setupPiHole
+		;;
+	6)
+	    setupTrafficCounter
+	    ;;
+	7)
 		exit 0
 		;;
 	esac
@@ -1543,6 +1556,3 @@ if [[ -e /etc/openvpn/server.conf && $AUTO_INSTALL != "y" ]]; then
 else
 	installOpenVPN
 fi
-
-sudo systemctl restart openvpn@server
-sudo systemctl restart pihole-FTL

@@ -21,6 +21,10 @@ update_system() {
 install_dependencies() {
     echo "Installing dependencies..."
     apt install -y sudo wget net-tools sudo bmon build-essential libssl-dev liblzo2-dev libpam0g-dev easy-rsa git openssl lz4 gcc cmake telnet curl make lsof
+    apt-get install -y build-essential pkg-config \
+  libssl-dev liblzo2-dev libpam0g-dev liblz4-dev libpkcs11-helper1-dev \
+  libnl-3-dev libnl-genl-3-dev \
+  libcap-ng-dev
 }
 
 # Function to download and prepare OpenVPN source
