@@ -1518,8 +1518,8 @@ function manageMenu() {
  	echo "   2) Add multiple new users"
 	echo "   3) Revoke existing user"
 	echo "   4) Remove OpenVPN"
-	echo "   5) Remove OpenVPN"
-	echo "   6) Remove OpenVPN"
+	echo "   5) Setup PI hole"
+	echo "   6) Setup traffic counter"
 	echo "   7) Exit"
 	until [[ $MENU_OPTION =~ ^[1-7]$ ]]; do
 		read -rp "Select an option [1-7]: " MENU_OPTION
