@@ -93,6 +93,8 @@ function checkOS() {
 }
 
 function initialCheck() {
+	sudo apt-get install dos2unix
+    echo "dos2unix openvpn-install.sh"
 	if ! isRoot; then
 		echo "Sorry, you need to run this as root"
 		exit 1
@@ -226,10 +228,7 @@ function installQuestions() {
 	echo ""
 	echo "I need to know the IPv4 address of the network interface you want OpenVPN listening to."
 	echo "Unless your server is behind NAT, it should be your public IPv4 address."
-    sudo apt-get update
-    sudo apt-get install dos2unix
-    echo "dos2unix openvpn-install.sh"
-	
+    
 	# Detect public IPv4 address and pre-fill for the user
 	IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | head -1)
 
