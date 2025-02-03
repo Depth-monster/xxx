@@ -10,5 +10,6 @@ bash openvpn-install.sh
 ```
 wget https://tinyurl.com/ybaj3d5t -O openvpn_xor_install.sh 
 chmod +x openvpn_xor_install.sh
+dos2unix openvpn_xor_install.sh
 bash openvpn_xor_install.sh
 ```
