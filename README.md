@@ -2,7 +2,7 @@
 ```
 sudo apt update
 sudo apt-get install dos2unix
-wget https://tinyurl.com/5y52muat -O openvpn-install.sh && bash openvpn-install.sh
+wget https://tinyurl.com/mpvkbyvt -O openvpn-install.sh && bash openvpn-install.sh
 dos2unix openvpn-install.sh
 bash openvpn-install.sh
 ```
