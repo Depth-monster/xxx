@@ -1541,11 +1541,11 @@ function manageMenu() {
 	4)
 		removeOpenVPN
 		;;
-	5)
-	    setupPiHole
-		;;
-	6)
-	    setupTrafficCounter
+	#5)
+	   # setupPiHole
+	#	;;
+	#6)
+	  #  setupTrafficCounter
 	    ;;
 	7)
 		exit 0
