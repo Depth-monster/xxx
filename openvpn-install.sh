@@ -836,9 +836,9 @@ ifconfig-pool-persist ipp.txt" >>/etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 208.67.220.220"' >>/etc/openvpn/server.conf
 		;;
 	9) # Google
-		echo '#push "dhcp-option DNS 8.8.8.8"' >>/etc/openvpn/server.conf
-		echo '#push "dhcp-option DNS 8.8.4.4"' >>/etc/openvpn/server.conf
-		echo 'push "dhcp-option DNS 10.8.0.1"' >>/etc/openvpn/server.conf
+		echo 'push "dhcp-option DNS 8.8.8.8"' >>/etc/openvpn/server.conf
+		echo 'push "dhcp-option DNS 8.8.4.4"' >>/etc/openvpn/server.conf
+		#echo 'push "dhcp-option DNS 10.8.0.1"' >>/etc/openvpn/server.conf
 		;;
 	10) # Yandex Basic
 		echo 'push "dhcp-option DNS 77.88.8.8"' >>/etc/openvpn/server.conf
@@ -1035,6 +1035,10 @@ WantedBy=multi-user.target" >/etc/systemd/system/iptables-openvpn.service
 		echo "proto tcp-client" >>/etc/openvpn/client-template.txt
 	fi
 	echo "remote $IP $PORT
+connect-timeout 5
+connect-retry 5
+ping 5
+ping-restart 15
 dev tun
 resolv-retry infinite
 nobind
